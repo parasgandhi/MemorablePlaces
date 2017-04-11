@@ -1,0 +1,215 @@
+<html>
+<head>
+<title>MapsActivity.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,128); font-weight: bold; }
+.s1 { color: rgb(0,0,0); }
+.s2 { color: rgb(0,128,0); font-weight: bold; }
+.s3 { color: rgb(128,128,128); font-style: italic; }
+.s4 { color: rgb(0,0,255); }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+MapsActivity.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0">package </span><span class="s1">com.parasgandhiourminimall.memorableplaces; 
+ 
+</span><span class="s0">import </span><span class="s1">android.app.ActionBar; 
+</span><span class="s0">import </span><span class="s1">android.app.Activity; 
+</span><span class="s0">import </span><span class="s1">android.content.Intent; 
+</span><span class="s0">import </span><span class="s1">android.content.pm.PackageManager; 
+</span><span class="s0">import </span><span class="s1">android.location.Criteria; 
+</span><span class="s0">import </span><span class="s1">android.location.Geocoder; 
+</span><span class="s0">import </span><span class="s1">android.location.Location; 
+</span><span class="s0">import </span><span class="s1">android.location.LocationListener; 
+</span><span class="s0">import </span><span class="s1">android.location.LocationManager; 
+</span><span class="s0">import </span><span class="s1">android.support.v4.app.ActivityCompat; 
+</span><span class="s0">import </span><span class="s1">android.support.v4.app.FragmentActivity; 
+</span><span class="s0">import </span><span class="s1">android.os.Bundle; 
+</span><span class="s0">import </span><span class="s1">android.support.v7.app.ActionBarActivity; 
+</span><span class="s0">import </span><span class="s1">android.support.v7.app.AppCompatActivity; 
+</span><span class="s0">import </span><span class="s1">android.util.Log; 
+</span><span class="s0">import </span><span class="s1">android.view.MenuItem; 
+ 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.identity.intents.Address; 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.maps.CameraUpdateFactory; 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.maps.GoogleMap; 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.maps.LocationSource; 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.maps.OnMapReadyCallback; 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.maps.SupportMapFragment; 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.maps.model.LatLng; 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.maps.model.Marker; 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.maps.model.MarkerOptions; 
+ 
+</span><span class="s0">import </span><span class="s1">java.io.IOException; 
+</span><span class="s0">import </span><span class="s1">java.util.Date; 
+</span><span class="s0">import </span><span class="s1">java.util.List; 
+</span><span class="s0">import </span><span class="s1">java.util.Locale; 
+ 
+</span><span class="s0">public class </span><span class="s1">MapsActivity </span><span class="s0">extends </span><span class="s1">AppCompatActivity </span><span class="s0">implements </span><span class="s1">OnMapReadyCallback, GoogleMap.OnMapLongClickListener, 
+        LocationListener { 
+ 
+    </span><span class="s0">private </span><span class="s1">GoogleMap mMap; 
+    LocationManager locationManager; 
+    String provider; 
+    Intent intent; 
+    Marker marker; 
+    String addsholder = </span><span class="s2">&quot;&quot;</span><span class="s1">;</span><span class="s3">//new Date().toString();</span><span class="s1"> 
+    LatLng markerLoc; 
+    String IntentType; 
+    </span><span class="s0">int </span><span class="s1">index; 
+    @Override 
+    </span><span class="s0">protected void </span><span class="s1">onCreate(Bundle savedInstanceState) { 
+        </span><span class="s0">super</span><span class="s1">.onCreate(savedInstanceState); 
+        setContentView(R.layout.activity_maps); 
+        </span><span class="s3">// Obtain the SupportMapFragment and get notified when the map is ready to be used.</span><span class="s1"> 
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager() 
+                .findFragmentById(R.id.map); 
+        mapFragment.getMapAsync(</span><span class="s0">this</span><span class="s1">); 
+ 
+        Intent i = getIntent(); 
+        IntentType = i.getStringExtra(</span><span class="s2">&quot;Intent Type&quot;</span><span class="s1">); 
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar(); 
+        actionBar.setDisplayHomeAsUpEnabled(</span><span class="s0">true</span><span class="s1">); 
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE); 
+        provider = locationManager.getBestProvider(</span><span class="s0">new </span><span class="s1">Criteria(), </span><span class="s0">false</span><span class="s1">); 
+        </span><span class="s0">if </span><span class="s1">(!IntentType.equals(</span><span class="s2">&quot;add&quot;</span><span class="s1">)){ 
+            index = Integer.parseInt(IntentType); 
+            index--; 
+            Log.i(</span><span class="s2">&quot;Index of Clicked&quot;</span><span class="s1">, String.valueOf(index)); 
+            Log.i(</span><span class="s2">&quot;size of placeLoc array&quot;</span><span class="s1">, MainActivity.placesLoc.size()+</span><span class="s2">&quot;&quot;</span><span class="s1">); 
+            Log.i(</span><span class="s2">&quot;LatLng from Array &quot;</span><span class="s1">, MainActivity.placesLoc.get(index)+</span><span class="s2">&quot;&quot;</span><span class="s1">); 
+            markerLoc = MainActivity.placesLoc.get(index); 
+            Log.i(</span><span class="s2">&quot;Latlng&quot;</span><span class="s1">,markerLoc.toString()); 
+        } 
+ 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onOptionsItemSelected(MenuItem item) { 
+        </span><span class="s0">switch </span><span class="s1">(item.getItemId()) { 
+            </span><span class="s0">case </span><span class="s1">android.R.id.home: 
+                </span><span class="s0">if </span><span class="s1">(IntentType.equals(</span><span class="s2">&quot;add&quot;</span><span class="s1">)){ 
+                    MainActivity.places.add(addsholder); 
+                    MainActivity.arrayAdapter.notifyDataSetChanged(); 
+                    MainActivity.placesLoc.add(markerLoc); 
+                } 
+                </span><span class="s3">// app icon in action bar clicked; goto parent activity.</span><span class="s1"> 
+                </span><span class="s0">this</span><span class="s1">.finish(); 
+            </span><span class="s0">default</span><span class="s1">: 
+                </span><span class="s0">return super</span><span class="s1">.onOptionsItemSelected(item); 
+        } 
+    } 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">onMapReady(GoogleMap googleMap) { 
+        mMap = googleMap; 
+ 
+        </span><span class="s0">if </span><span class="s1">(IntentType.equals(</span><span class="s2">&quot;add&quot;</span><span class="s1">)){ 
+            Location location = locationManager.getLastKnownLocation(provider); 
+            LatLng current = </span><span class="s0">new </span><span class="s1">LatLng(location.getLatitude(),location.getLongitude()); 
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current,</span><span class="s4">15</span><span class="s1">)); 
+            onLocationChanged(location); 
+        }</span><span class="s0">else </span><span class="s1">{ 
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(markerLoc,</span><span class="s4">15</span><span class="s1">)); 
+            marker = mMap.addMarker(</span><span class="s0">new </span><span class="s1">MarkerOptions().position(markerLoc).title(MainActivity.places.get(index+</span><span class="s4">1</span><span class="s1">))); 
+        } 
+    } 
+ 
+ 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">onMapLongClick(LatLng latLng) { 
+        System.out.println(</span><span class="s2">&quot;latLng: &quot;</span><span class="s1">+latLng); 
+        </span><span class="s0">if </span><span class="s1">(IntentType.equals(</span><span class="s2">&quot;add&quot;</span><span class="s1">)){ 
+            markerLoc = latLng; 
+            </span><span class="s0">if </span><span class="s1">(marker!=</span><span class="s0">null</span><span class="s1">){ 
+                marker.remove(); 
+            } 
+            Geocoder geocoder = </span><span class="s0">new </span><span class="s1">Geocoder(getApplicationContext(), Locale.getDefault()); 
+            addsholder = </span><span class="s2">&quot;&quot;</span><span class="s1">; 
+            </span><span class="s0">try </span><span class="s1">{ 
+                List&lt;android.location.Address&gt; addressList = geocoder.getFromLocation(latLng.latitude,latLng.longitude,</span><span class="s4">1</span><span class="s1">); 
+                </span><span class="s0">if </span><span class="s1">(addressList!=</span><span class="s0">null</span><span class="s1">&amp;&amp;addressList.size()&gt;</span><span class="s4">0</span><span class="s1">){ 
+                    </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s4">0</span><span class="s1">; i&lt;addressList.get(</span><span class="s4">0</span><span class="s1">).getMaxAddressLineIndex(); i++){ 
+                        addsholder += addressList.get(</span><span class="s4">0</span><span class="s1">).getAddressLine(i); 
+                    } 
+                } 
+            } </span><span class="s0">catch </span><span class="s1">(IOException e) { 
+                e.printStackTrace(); 
+            } 
+            marker = mMap.addMarker(</span><span class="s0">new </span><span class="s1">MarkerOptions().position(latLng).title(addsholder)); 
+            System.out.println(</span><span class="s2">&quot;Done With the Marker and Address&quot;</span><span class="s1">); 
+            System.out.println(</span><span class="s2">&quot;Adds: &quot;</span><span class="s1">+addsholder); 
+            System.out.println(</span><span class="s2">&quot;Long Click Loc: &quot;</span><span class="s1">+latLng.toString()); 
+</span><span class="s3">//            Log.i(&quot;Long Click at :&quot;,);</span><span class="s1"> 
+ 
+        } 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">onLocationChanged(Location location) { 
+        </span><span class="s0">if </span><span class="s1">(IntentType.equals(</span><span class="s2">&quot;add&quot;</span><span class="s1">)){ 
+            LatLng latLng = </span><span class="s0">new </span><span class="s1">LatLng(location.getLatitude(),location.getLongitude()); 
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,</span><span class="s4">12</span><span class="s1">)); 
+            System.out.println(</span><span class="s2">&quot;Lat: &quot;</span><span class="s1">+latLng.latitude+</span><span class="s2">&quot;</span><span class="s0">\n</span><span class="s2">Lon:&quot;</span><span class="s1">+latLng.longitude); 
+ 
+            mMap.setOnMapLongClickListener(</span><span class="s0">new </span><span class="s1">GoogleMap.OnMapLongClickListener() { 
+                @Override 
+                </span><span class="s0">public void </span><span class="s1">onMapLongClick(LatLng latLng) { 
+                    </span><span class="s0">if </span><span class="s1">(marker!=</span><span class="s0">null</span><span class="s1">){ 
+                        marker.remove(); 
+                    } 
+                    Geocoder geocoder = </span><span class="s0">new </span><span class="s1">Geocoder(getApplicationContext(), Locale.getDefault()); 
+                    </span><span class="s0">try </span><span class="s1">{ 
+                        List&lt;android.location.Address&gt; addressList = geocoder.getFromLocation(latLng.latitude,latLng.longitude,</span><span class="s4">1</span><span class="s1">); 
+                        </span><span class="s0">if </span><span class="s1">(addressList!=</span><span class="s0">null</span><span class="s1">&amp;&amp;addressList.size()&gt;</span><span class="s4">0</span><span class="s1">){ 
+                            </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s4">0</span><span class="s1">; i&lt;addressList.get(</span><span class="s4">0</span><span class="s1">).getMaxAddressLineIndex(); i++){ 
+                                addsholder += addressList.get(</span><span class="s4">0</span><span class="s1">).getAddressLine(i); 
+                            } 
+                        } 
+                    } </span><span class="s0">catch </span><span class="s1">(IOException e) { 
+                        e.printStackTrace(); 
+                    } 
+                    marker = mMap.addMarker(</span><span class="s0">new </span><span class="s1">MarkerOptions().position(latLng).title(addsholder)); 
+                    System.out.println(</span><span class="s2">&quot;Done With the Marker and Address&quot;</span><span class="s1">); 
+                    System.out.println(</span><span class="s2">&quot;Adds: &quot;</span><span class="s1">+addsholder); 
+                } 
+            }); 
+        } 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">onStatusChanged(String s, </span><span class="s0">int </span><span class="s1">i, Bundle bundle) { 
+ 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">onProviderEnabled(String s) { 
+ 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">onProviderDisabled(String s) { 
+ 
+    } 
+ 
+    @Override 
+    </span><span class="s0">protected void </span><span class="s1">onResume() { 
+        </span><span class="s0">super</span><span class="s1">.onResume(); 
+        locationManager.requestLocationUpdates(provider, </span><span class="s4">400</span><span class="s1">, </span><span class="s4">1</span><span class="s1">, </span><span class="s0">this</span><span class="s1">); 
+    } 
+ 
+    @Override 
+    </span><span class="s0">protected void </span><span class="s1">onPause() { 
+        </span><span class="s0">super</span><span class="s1">.onPause(); 
+        locationManager.removeUpdates(</span><span class="s0">this</span><span class="s1">); 
+    } 
+} 
+</span></pre>
+</body>
+</html>
